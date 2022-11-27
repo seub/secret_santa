@@ -6,7 +6,8 @@ import random
 
 
 names = ["Denis", "Marie-Laure", "Brice", "Benja", "Robin", "Charlotte", "Seb"]
-nb_draws = 3
+nb_draws = 2
+#gift_labels = ["gros", "petit"]
 
 
 # https://stackoverflow.com/questions/25200220/generate-a-random-derangement-of-a-list
@@ -61,20 +62,23 @@ def random_derangements(n, d):
         res.append(next)
     return res
 
-def write_message(gifter, giftees):
-    res = f"Hello {gifter}!\n"
+def write_message(gifter, giftees, gift_labels=None):
+    res = f"Hello {gifter} !\n"
     for i, giftee in enumerate(giftees):
-        res += f"\nTirage {i+1}: {giftee}"
+        if gift_labels is None:
+            res += f"\nCadeau {i+1} : {giftee}"
+        else:
+            res += f"\nCadeau {i+1} ({gift_labels[i]}): {giftee}"
     return res
 
-def santa_claus(names, nb_draws):
+def santa_claus(names, nb_draws, gift_labels=None):
     n = len(names)
     d = nb_draws
     prods = random_derangements(n, d)
     for i in range(n):
         gifter = names[i]
         giftees = [names[prods[k][i]] for k in range(d)]
-        message = write_message(gifter, giftees)
+        message = write_message(gifter, giftees, gift_labels)
         with open(f"{gifter}.txt", "w") as f:
             f.write(message)
 
