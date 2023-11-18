@@ -11,6 +11,7 @@ Example usage:
 
 
 import logging
+import pprint
 
 from .derangements import Permutation, random_derangements
 
@@ -49,7 +50,7 @@ class SecretSanta():
         secret_lists : dict[str, list[str]] = dict()
         for i, name in enumerate(self.names):
             secret_lists[name] = [self.names[perm(i)] for perm in perms]
-        print(f"{secret_lists = }")
+        # print(f"{secret_lists = }")
         self.secret_lists = secret_lists
 
 
@@ -64,6 +65,24 @@ class SecretSanta():
         return exclusions.copy()
     
 
+    def stats(self, N: int):        
+        counters : dict[str, dict[str, list[int]]] = dict()
+        for name in self.names:
+            counters[name] = dict()
+            for name2 in self.names:
+                counters[name][name2] = [0] * self.num_gifts
+        for _ in range(N):
+            self.draw()
+            for name in self.names:
+                for k in range(self.num_gifts):
+                    counters[name][self.secret_lists[name][k]][k] += 1
+        stats : dict[str, dict[str, list[float]]] = dict()
+        for name in self.names:
+            stats[name] = dict()
+            for name2 in self.names:
+                stats[name][name2] = [counters[name][name2][k]/N for k in range(self.num_gifts)]
+        pprint.pprint(stats)
+
 
 
 # def write_message(gifter, giftees, gift_labels=None):
@@ -77,7 +96,7 @@ class SecretSanta():
 
 def main(names : list[str], num_gifts : int = 1, exclude_groups : list[list[str]] | None = None):
     santa = SecretSanta(names=names, num_gifts=num_gifts, exclude_groups=exclude_groups)
-    santa.draw()
+    santa.stats(N=10000)
 
 
 
