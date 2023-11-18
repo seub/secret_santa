@@ -1,18 +1,93 @@
 #!/usr/bin/env python
 
-from typing import 
+"""
+Module to manipulate Permutation objects. A Permutation represents the mathetical concept of
+a permutation of a finite set. It is internally represented by a list of length n 
+containing the integers 0, ..., n-1.
+
+Recall that a derangement is a permutation without fixed points.
+"""
+
+
+import logging
 import random
-import sqlalchemy
+
+
+
+logger = logging.getLogger(__name__)
+
+
+
+class Permutation:
+    def __init__(
+            self, 
+            n: int, 
+            v: list[int] | None = None,
+            random_derangement: bool = False,
+        ) -> None:
+        assert(v is None or not random_derangement)
+
+        self.n = n
+
+        if v is not None:
+            assert(len(v) == n)
+            self.v = v.copy()
+        else:
+            if random_derangement:
+                self.v = _get_random_derangement(n)
+            else:
+                self.v = list(range(n))
+
+
+    def __call__(self, i: int) -> int:
+        return self.v[i]
+
+
+    def __mul__(self, other: 'Permutation') -> 'Permutation':
+        """
+        Returns the product of permutations result = self compose other
+        """
+        n = self.n
+        assert(other.n == n)
+        w : list[int] = [0] * n
+        for i in range(n):
+            w[i] = self.v[other.v[i]]
+        return Permutation(n, w)
+    
+
+    def inverse(self) -> 'Permutation':
+        n = self.n
+        w : list[int] = [0] * n
+        for i, x in enumerate(self.v):
+            w[x] = i
+        return Permutation(n=n, v=w)
+
+
+    def is_derangement(self) -> bool:
+        for (i, x) in enumerate(self.v):
+            if x == i:
+                return False
+        return True
+
+
+    def verifies_exclusions(self, exclusions: list[list[int]]) -> bool:
+        assert(len(exclusions) == self.n)
+        for (i, x) in enumerate(self.v):
+            if x in exclusions[i]:
+                return False
+        return True
 
 
 # https://stackoverflow.com/questions/25200220/generate-a-random-derangement-of-a-list
-def random_derangement(n: int) -> tuple[int]:
+def _get_random_derangement(n: int) -> list[int]:
     """
     Returns an n-tuple representing a derangement of a set of n elements
     """
+
+    logger.info("Initializing Permutation...")
     while True:
-        v = [i for i in range(n)]
-        for j in range(n - 1, -1, -1):
+        v : list[int] = list(range(n))
+        for j in range(n-1, -1, -1):
             p = random.randint(0, j)
             if v[p] == j:
                 break
@@ -20,71 +95,30 @@ def random_derangement(n: int) -> tuple[int]:
                 v[j], v[p] = v[p], v[j]
         else:
             if v[0] != 0:
-                return tuple(v)
+                return v
 
 
-def test
 
-def is_derangement(s):
-    for (i, x) in enumerate(s):
-        if x == i:
-            return False
-    return True
-
-def permutation_prod(u, v):
-    """Returns the product of permutations w = u compose v"""
-    n = len(u)
-    w = [0] * n
-    for i in range(n):
-        w[i] = u[v[i]]
-    return tuple(w)
-
-def permutation_inverse(v):
-    """Returns the inverse w=v^{-1} of a permutations v"""
-    n = len(v)
-    w = [0] * n
-    for i, x in enumerate(v):
-        w[x] = i
-    return tuple(w)
-
-def random_derangements(n, d):
-    """Generates a list of derangements s_1, ... s_d, so that for any i != j, the product s_j * s_i^{-1}
-    is still a derangement."""
-    res = []
+def random_derangements(n: int, d: int, exclusions: list[list[int]] | None = None ) -> list[Permutation]:
+    """
+    Generates a list of derangements s_1, ... s_d, so that for all i in range(n), 
+    the values s_1[i], ..., s_d[i] are distinct.
+    
+    Optionally pass a list of exclusions: the resulting derangements must satisfy 
+    s[i] not in exclusions[i].
+    """
+    res : list[Permutation] = []
     while (len(res) < d):
         success = False
         while not success:
-            next = random_derangement(n)
+            next = Permutation(n, random_derangement=True)
+            if exclusions is not None and not next.verifies_exclusions(exclusions):
+                success = False
+                continue
             success = True
             for s in res:
-                if not is_derangement(permutation_prod(next, permutation_inverse(s))):
+                if not (next * s.inverse()).is_derangement():
                     success = False
                     break
-        res.append(next)
+        res.append(next) # type: ignore
     return res
-
-def write_message(gifter, giftees, gift_labels=None):
-    res = f"Hello {gifter} !\n"
-    for i, giftee in enumerate(giftees):
-        if gift_labels is None:
-            res += f"\nCadeau {i+1} : {giftee}"
-        else:
-            res += f"\nCadeau {i+1} ({gift_labels[i]}): {giftee}"
-    return res
-
-def santa_claus(names, nb_draws, gift_labels=None):
-    n = len(names)
-    d = nb_draws
-    prods = random_derangements(n, d)
-    for i in range(n):
-        gifter = names[i]
-        giftees = [names[prods[k][i]] for k in range(d)]
-        message = write_message(gifter, giftees, gift_labels)
-        with open(f"{gifter}.txt", "w") as f:
-            f.write(message)
-
-def main():
-    santa_claus(names, nb_draws)
-
-if __name__ == '__main__':
-    main()
