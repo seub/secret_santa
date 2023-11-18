@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
+from typing import 
 import random
-
-
-
-names = ["Denis", "Marie-Laure", "Brice", "Benja", "Robin", "Charlotte", "Seb"]
-nb_draws = 2
-#gift_labels = ["gros", "petit"]
+import sqlalchemy
 
 
 # https://stackoverflow.com/questions/25200220/generate-a-random-derangement-of-a-list
-def random_derangement(n):
+def random_derangement(n: int) -> tuple[int]:
+    """
+    Returns an n-tuple representing a derangement of a set of n elements
+    """
     while True:
         v = [i for i in range(n)]
         for j in range(n - 1, -1, -1):
@@ -22,6 +21,9 @@ def random_derangement(n):
         else:
             if v[0] != 0:
                 return tuple(v)
+
+
+def test
 
 def is_derangement(s):
     for (i, x) in enumerate(s):
