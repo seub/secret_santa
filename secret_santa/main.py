@@ -49,7 +49,7 @@ class SecretSanta():
         secret_lists : dict[str, list[str]] = dict()
         for i, name in enumerate(self.names):
             secret_lists[name] = [self.names[perm(i)] for perm in perms]
-        print(f"")
+        print(f"{secret_lists = }")
         self.secret_lists = secret_lists
 
 
@@ -75,11 +75,11 @@ class SecretSanta():
 #             res += f"\nCadeau {i+1} ({gift_labels[i]}): {giftee}"
 #     return res
 
-def main(names : list[str], num_gifts : int = 1):
-    santa = SecretSanta(names=names, num_gifts=num_gifts)
+def main(names : list[str], num_gifts : int = 1, exclude_groups : list[list[str]] | None = None):
+    santa = SecretSanta(names=names, num_gifts=num_gifts, exclude_groups=exclude_groups)
     santa.draw()
 
 
 
 if __name__ == '__main__':
-    main(names=NAMES, num_gifts=NUM_GIFTS)
+    main(names=NAMES, num_gifts=NUM_GIFTS, exclude_groups=EXCLUDE_GROUPS)
