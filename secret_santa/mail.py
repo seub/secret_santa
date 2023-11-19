@@ -27,25 +27,21 @@ def get_gmail_settings() -> GmailSettings:
     return GmailSettings() # type: ignore
 
 
-def send_gmail(subject: str, body: str, recipients: list[str], sender: str = "brice.loustau@gmail.com") -> None:
+def send_gmail(subject: str, body: str, recipients: list[str]) -> None:
     logger.info(f"Sending email to {recipients}")
 
     gmail_settings = get_gmail_settings()
-    print(gmail_settings)
-    # print(f"{gmail_settings.user_email = }")
-    # print(f"{gmail_settings.app_password = }")
 
-    # msg = MIMEMultipart()
-    # msg['Subject'] = subject
-    # msg['From'] = sender
-    # msg['To'] = ", ".join(recipients)
-    # msg.attach(MIMEText(body, 'plain'))
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = ", ".join(recipients)
+    msg.attach(MIMEText(body, 'plain'))
 
-    # # Using TLS
-    # with smtplib.SMTP('smtp.gmail.com', 587) as server:
-    #     server.starttls()  # Secure the connection
-    #     server.login(sender, password)
-    #     server.send_message(msg)
+    with smtplib.SMTP('smtp.gmail.com', 587) as server:
+        server.starttls()  # Secure the connection
+        server.login(gmail_settings.user_email, gmail_settings.app_password)
+        server.send_message(msg)
 
 
 
