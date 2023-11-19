@@ -14,27 +14,40 @@ import logging
 import pprint
 
 from .derangements import Permutation, random_derangements
-
+from .mail import send_gmail
 
 
 logger = logging.getLogger(__name__)
 
 
 
-NAMES = ["Denis", "Marie-Laure", "Brice", "Benja", "Robin", "Julie", "Charlotte", "Seb"]
+NAMES = ["Nono", "Marie-Laure", "Brice", "Benja", "Robin", "Julie", "Charlotte", "Seb"]
+EMAILS = {
+    "Nono": "briceloustau@gmail.com",
+    "Marie-Laure": "briceloustau@gmail.com",
+    "Brice": "briceloustau@gmail.com",
+    "Benja": "briceloustau@gmail.com",
+    "Robin": "briceloustau@gmail.com",
+    "Julie": "briceloustau@gmail.com",
+    "Charlotte": "briceloustau@gmail.com",
+    "Seb": "briceloustau@gmail.com",
+}
 NUM_GIFTS = 2
-EXCLUDE_GROUPS = [["Denis", "Marie-Laure"], ["Brice", "Benja"], ["Robin", "Julie"], ["Charlotte", "Seb"]]
+EXCLUDE_GROUPS = [["Nono", "Marie-Laure"], ["Brice", "Benja"], ["Robin", "Julie"], ["Charlotte", "Seb"]]
 
 
 
 class SecretSanta():
     def __init__(
-            self, names: list[str], 
+            self, 
+            names: list[str],
+            emails: dict[str, str],
             num_gifts: int = 1, 
             exclude_groups: list[list[str]] | None = None
         ) -> None:
         self.num_people = len(names)
         self.names = names
+        self.emails = emails
         self.num_gifts = num_gifts
         self.exclude_groups = exclude_groups
 
@@ -83,22 +96,47 @@ class SecretSanta():
                 stats[name][name2] = [counters[name][name2][k]/N for k in range(self.num_gifts)]
         pprint.pprint(stats)
 
+    def send_emails(self) -> None:
+        for name in self.names:
+            send_gmail(
+                subject = f"Secret Santa 2023! 🎅🤫",
+                body= self.create_message(name),
+                recipients = [self.emails[name]],
+            )
+
+    def create_message(self, name: str) -> str:
+        gifter = name
+        giftees = self.secret_lists[gifter]
+
+        res = f"\n\n\nHohoho! Salut {name} !\n\n"
+        res += f"Découvre dans ce message secret qui tu vas devoir gâter pour Noël !\n\n"
+
+        for i, giftee in enumerate(giftees):
+            res += f"🎁 Cadeau {i+1} : {giftee}\n"
+
+        res += "\n\nJoyeux Noël! Hohoho! 🎄🎄🎄\n\nSecret Santa 🎅🤫"
+
+        print(res)
+        return res
 
 
-# def write_message(gifter, giftees, gift_labels=None):
-#     res = f"Hello {gifter} !\n"
-#     for i, giftee in enumerate(giftees):
-#         if gift_labels is None:
-#             res += f"\nCadeau {i+1} : {giftee}"
-#         else:
-#             res += f"\nCadeau {i+1} ({gift_labels[i]}): {giftee}"
-#     return res
 
-def main(names : list[str], num_gifts : int = 1, exclude_groups : list[list[str]] | None = None):
-    santa = SecretSanta(names=names, num_gifts=num_gifts, exclude_groups=exclude_groups)
-    santa.stats(N=10000)
+def main(
+        names : list[str], 
+        emails: dict[str, str], 
+        num_gifts : int = 1,
+        exclude_groups : list[list[str]] | None = None
+    ) -> None:
+    santa = SecretSanta(names=names, emails=emails, num_gifts=num_gifts, exclude_groups=exclude_groups)
+    santa.draw()
+    santa.send_emails()
 
 
 
 if __name__ == '__main__':
-    main(names=NAMES, num_gifts=NUM_GIFTS, exclude_groups=EXCLUDE_GROUPS)
+    main(
+        names = NAMES, 
+        emails = EMAILS,
+        num_gifts = NUM_GIFTS, 
+        exclude_groups = EXCLUDE_GROUPS
+    )

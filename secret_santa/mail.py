@@ -31,6 +31,8 @@ def send_gmail(subject: str, body: str, recipients: list[str]) -> None:
     logger.info(f"Sending email to {recipients}")
 
     gmail_settings = get_gmail_settings()
+    sender = gmail_settings.user_email
+    password = gmail_settings.app_password
 
     msg = MIMEMultipart()
     msg['Subject'] = subject
@@ -40,7 +42,7 @@ def send_gmail(subject: str, body: str, recipients: list[str]) -> None:
 
     with smtplib.SMTP('smtp.gmail.com', 587) as server:
         server.starttls()  # Secure the connection
-        server.login(gmail_settings.user_email, gmail_settings.app_password)
+        server.login(sender, password)
         server.send_message(msg)
 
 
