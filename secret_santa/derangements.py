@@ -83,8 +83,6 @@ def _get_random_derangement(n: int) -> list[int]:
     """
     Returns an n-tuple representing a derangement of a set of n elements
     """
-
-    logger.info("Initializing Permutation...")
     while True:
         v : list[int] = list(range(n))
         for j in range(n-1, -1, -1):

@@ -3,13 +3,15 @@
 """
 Use this Python module to generate a random draw for Secret Santa.
 
-Example usage:
-1. In this file, edit NAMES, NUM_GIFTS, and optionally EXCLUDE_GROUPS (or comment it out).
+Usage
+1. In this file, edit NAMES, EMAILS, NUM_GIFTS, and optionally EXCLUDE_GROUPS (or comment it out).
+2. Run the script: from the parent folder, execute `python3 -m main [--send]`.
 
-
+If you do not use the `--send` flag, it will be a dry run and no emails will be sent.
 """
 
 
+import argparse
 import logging
 import pprint
 
@@ -17,8 +19,14 @@ from .derangements import Permutation, random_derangements
 from .mail import send_gmail
 
 
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+formatter = logging.Formatter('[%(levelname)s] %(message)s')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
 
 
 NAMES = ["Nono", "Marie-Laure", "Brice", "Benja", "Robin", "Julie", "Charlotte", "Seb"]
@@ -26,7 +34,7 @@ EMAILS = {
     "Nono": "briceloustau@gmail.com",
     "Marie-Laure": "briceloustau@gmail.com",
     "Brice": "briceloustau@gmail.com",
-    "Benja": "briceloustau@gmail.com",
+    "Benja": "bdv2113@gmail.com",
     "Robin": "briceloustau@gmail.com",
     "Julie": "briceloustau@gmail.com",
     "Charlotte": "briceloustau@gmail.com",
@@ -58,6 +66,7 @@ class SecretSanta():
 
 
     def draw(self):
+        logger.info("Drawing odds...")
         exclusions = self._get_exclusions()
         perms : list[Permutation] = random_derangements(n=self.num_people, d=self.num_gifts, exclusions=exclusions)
         secret_lists : dict[str, list[str]] = dict()
@@ -96,27 +105,38 @@ class SecretSanta():
                 stats[name][name2] = [counters[name][name2][k]/N for k in range(self.num_gifts)]
         pprint.pprint(stats)
 
-    def send_emails(self) -> None:
+
+    def send_emails(self, dry_run: bool = False) -> None:
+        logger.info("Sending emails...")
         for name in self.names:
-            send_gmail(
-                subject = f"Secret Santa 2023! 🎅🤫",
-                body= self.create_message(name),
-                recipients = [self.emails[name]],
-            )
+            subject = f"Père Noël Secret 2023 ! 🎅🤫"
+            message = self.create_message(name)
+            if dry_run:
+                logger.info(f"This is a dry run. Here is the email that would be sent to {name}:\n-----")
+                print(f"{subject}")
+                print(f"-----")
+                print(f"{message}")
+                print(f"-----\n")
+            else:
+                send_gmail(
+                    subject = subject,
+                    body = message,
+                    recipients = [self.emails[name]],
+                )
 
     def create_message(self, name: str) -> str:
         gifter = name
         giftees = self.secret_lists[gifter]
 
-        res = f"\n\n\nHohoho! Salut {name} !\n\n"
-        res += f"Découvre dans ce message secret qui tu vas devoir gâter pour Noël !\n\n"
+        res = f"Hohoho! Salut {name} !\n\n"
+        res += f"Je suis le Père Noël Secret programmé par Brice et je viens de faire le tirage au sort.\n\n"
+        res += f"Découvre qui tu vas devoir gâter pour Noël, hohoho!\n\n"
 
         for i, giftee in enumerate(giftees):
             res += f"🎁 Cadeau {i+1} : {giftee}\n"
 
-        res += "\n\nJoyeux Noël! Hohoho! 🎄🎄🎄\n\nSecret Santa 🎅🤫"
-
-        print(res)
+        res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄\n\n"
+        res += "PS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
         return res
 
 
@@ -125,18 +145,27 @@ def main(
         names : list[str], 
         emails: dict[str, str], 
         num_gifts : int = 1,
-        exclude_groups : list[list[str]] | None = None
+        exclude_groups : list[list[str]] | None = None,
+        send: bool = False,
     ) -> None:
+    logger.info("Starting Secret Santa...")
     santa = SecretSanta(names=names, emails=emails, num_gifts=num_gifts, exclude_groups=exclude_groups)
     santa.draw()
-    santa.send_emails()
+    santa.send_emails(dry_run=not send)
+    logger.info("Done!")
+
 
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--send", action="store_true")
+    args = parser.parse_args()
+
     main(
         names = NAMES, 
         emails = EMAILS,
         num_gifts = NUM_GIFTS, 
-        exclude_groups = EXCLUDE_GROUPS
+        exclude_groups = EXCLUDE_GROUPS,
+        send = args.send,
     )
