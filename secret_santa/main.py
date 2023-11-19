@@ -31,14 +31,14 @@ logger.addHandler(ch)
 
 NAMES = ["Nono", "Marie-Laure", "Brice", "Benja", "Robin", "Julie", "Charlotte", "Seb"]
 EMAILS = {
-    "Nono": "briceloustau@gmail.com",
-    "Marie-Laure": "briceloustau@gmail.com",
-    "Brice": "briceloustau@gmail.com",
+    "Nono": "loustau.denis@gmail.com",
+    "Marie-Laure": "marielaure.loustau@gmail.com",
+    "Brice": "brice.loustau@gmail.com",
     "Benja": "bdv2113@gmail.com",
-    "Robin": "briceloustau@gmail.com",
-    "Julie": "briceloustau@gmail.com",
-    "Charlotte": "briceloustau@gmail.com",
-    "Seb": "briceloustau@gmail.com",
+    "Robin": "robin.loustau@gmail.com",
+    "Julie": "priault.julie@gmail.com",
+    "Charlotte": "charlotte.loustau@gmail.com",
+    "Seb": "sebastien.arches@gmail.com",
 }
 NUM_GIFTS = 2
 EXCLUDE_GROUPS = [["Nono", "Marie-Laure"], ["Brice", "Benja"], ["Robin", "Julie"], ["Charlotte", "Seb"]]
@@ -130,13 +130,13 @@ class SecretSanta():
 
         res = f"Hohoho! Salut {name} !\n\n"
         res += f"Je suis le Père Noël Secret programmé par Brice et je viens de faire le tirage au sort.\n\n"
-        res += f"Découvre qui tu vas devoir gâter pour Noël, hohoho!\n\n"
+        res += f"Découvre qui tu vas devoir gâter pour Noël !\n\n"
 
         for i, giftee in enumerate(giftees):
             res += f"🎁 Cadeau {i+1} : {giftee}\n"
 
         res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄\n\n"
-        res += "PS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
+        # res += "PS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
         return res
 
 
