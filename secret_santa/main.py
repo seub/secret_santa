@@ -135,8 +135,8 @@ class SecretSanta():
         for i, giftee in enumerate(giftees):
             res += f"🎁 Cadeau {i+1} : {giftee}\n"
 
-        res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄\n\n"
-        # res += "PS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
+        res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄"
+        # res += "\n\nPS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
         return res
 
 
