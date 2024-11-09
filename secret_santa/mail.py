@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+"""
+This module provides functions to send emails using Gmail.
+"""
+
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -16,6 +20,10 @@ logger = logging.getLogger(__name__)
 
 
 class GmailSettings(BaseSettings):
+    """
+    Pydantic model for Gmail settings.
+    """
+
     user_email: str
     app_password: str
 
@@ -24,10 +32,16 @@ class GmailSettings(BaseSettings):
 
 @cache
 def get_gmail_settings() -> GmailSettings:
+    """
+    Create and return a GmailSettings instance.
+    """
     return GmailSettings() # type: ignore
 
 
 def send_gmail(subject: str, body: str, recipients: list[str]) -> None:
+    """
+    Send an email using Gmail.
+    """
     logger.info(f"Sending email to {recipients}")
 
     gmail_settings = get_gmail_settings()
@@ -49,7 +63,7 @@ def send_gmail(subject: str, body: str, recipients: list[str]) -> None:
 
 if __name__ == '__main__':
     send_gmail(
-        subject = 'Test Subject', 
-        body = 'This is a test email', 
+        subject = 'Test Subject',
+        body = 'This is a test email',
         recipients = ['briceloustau@gmail.com'],
     )
