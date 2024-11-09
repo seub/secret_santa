@@ -5,7 +5,10 @@ Use this Python module to generate a random draw for Secret Santa.
 
 Usage
 1. In this file, edit NAMES, EMAILS, NUM_GIFTS, and optionally EXCLUDE_GROUPS (or comment it out).
-2. Run the script: from the parent folder, execute `python3 -m main [--send]`.
+2. Run the script: from the parent folder, run:
+```
+python3 -m secret_santa.main [--send]
+```
 
 If you do not use the `--send` flag, it will be a dry run and no emails will be sent.
 """
