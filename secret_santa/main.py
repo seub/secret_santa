@@ -191,4 +191,3 @@ if __name__ == '__main__':
         exclude_groups = EXCLUDE_GROUPS,
         send = args.send,
     )
-
