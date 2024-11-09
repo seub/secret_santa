@@ -49,11 +49,14 @@ EXCLUDE_GROUPS = [["Nono", "Marie-Laure"], ["Brice", "Benja"], ["Robin", "Julie"
 
 
 class SecretSanta():
+    """
+    Class representing the Secret Santa bot.
+    """
     def __init__(
-            self, 
+            self,
             names: list[str],
             emails: dict[str, str],
-            num_gifts: int = 1, 
+            num_gifts: int = 1,
             exclude_groups: list[list[str]] | None = None
         ) -> None:
         self.num_people = len(names)
@@ -67,16 +70,18 @@ class SecretSanta():
             indices[name] = i
         self.indices = indices
 
+        self.secret_lists : dict[str, list[str]] = dict()
+
 
     def draw(self):
+        """
+        Draw the secret lists.
+        """
         logger.info("Drawing odds...")
         exclusions = self._get_exclusions()
         perms : list[Permutation] = random_derangements(n=self.num_people, d=self.num_gifts, exclusions=exclusions)
-        secret_lists : dict[str, list[str]] = dict()
         for i, name in enumerate(self.names):
-            secret_lists[name] = [self.names[perm(i)] for perm in perms]
-        # print(f"{secret_lists = }")
-        self.secret_lists = secret_lists
+            self.secret_lists[name] = [self.names[perm(i)] for perm in perms]
 
 
     def _get_exclusions(self) -> list[list[int]] | None:
@@ -88,15 +93,18 @@ class SecretSanta():
             for name in group:
                 exclusions[self.indices[name]] = group_indices.copy()
         return exclusions.copy()
-    
 
-    def stats(self, N: int):        
+
+    def stats(self, num_draws: int):
+        """
+        Compute statistics on the draws.
+        """
         counters : dict[str, dict[str, list[int]]] = dict()
         for name in self.names:
             counters[name] = dict()
             for name2 in self.names:
                 counters[name][name2] = [0] * self.num_gifts
-        for _ in range(N):
+        for _ in range(num_draws):
             self.draw()
             for name in self.names:
                 for k in range(self.num_gifts):
@@ -105,21 +113,24 @@ class SecretSanta():
         for name in self.names:
             stats[name] = dict()
             for name2 in self.names:
-                stats[name][name2] = [counters[name][name2][k]/N for k in range(self.num_gifts)]
+                stats[name][name2] = [counters[name][name2][k]/num_draws for k in range(self.num_gifts)]
         pprint.pprint(stats)
 
 
     def send_emails(self, dry_run: bool = False) -> None:
+        """
+        Send the emails to the participants.
+        """
         logger.info("Sending emails...")
         for name in self.names:
-            subject = f"Père Noël Secret 2023 ! 🎅🤫"
+            subject = "Père Noël Secret 2023 ! 🎅🤫"
             message = self.create_message(name)
             if dry_run:
                 logger.info(f"This is a dry run. Here is the email that would be sent to {name}:\n-----")
                 print(f"{subject}")
-                print(f"-----")
+                print("-----")
                 print(f"{message}")
-                print(f"-----\n")
+                print("-----\n")
             else:
                 send_gmail(
                     subject = subject,
@@ -128,29 +139,35 @@ class SecretSanta():
                 )
 
     def create_message(self, name: str) -> str:
+        """
+        Create the email message for a given name.
+        """
         gifter = name
         giftees = self.secret_lists[gifter]
 
         res = f"Hohoho! Salut {name} !\n\n"
-        res += f"Je suis le Père Noël Secret programmé par Brice et je viens de faire le tirage au sort.\n\n"
-        res += f"Découvre qui tu vas devoir gâter pour Noël !\n\n"
+        res += "Je suis le bot 🤖 du Père Noël Secret 🎅 en charge des tirages au sort.\n\n"
+        res += "Découvre qui tu vas devoir gâter pour Noël !\n\n"
 
         for i, giftee in enumerate(giftees):
             res += f"🎁 Cadeau {i+1} : {giftee}\n"
 
         res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄"
-        # res += "\n\nPS: Ne réponds pas à ce message, car Brice ne l'a pas vu !" 
+        res += "\n\nPS: Ne réponds pas à ce message, car Brice ne l'a pas vu !"
         return res
 
 
 
 def main(
-        names : list[str], 
-        emails: dict[str, str], 
+        names : list[str],
+        emails: dict[str, str],
         num_gifts : int = 1,
         exclude_groups : list[list[str]] | None = None,
         send: bool = False,
     ) -> None:
+    """
+    Main function to run the Secret Santa bot.
+    """
     logger.info("Starting Secret Santa...")
     santa = SecretSanta(names=names, emails=emails, num_gifts=num_gifts, exclude_groups=exclude_groups)
     santa.draw()
@@ -166,9 +183,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     main(
-        names = NAMES, 
+        names = NAMES,
         emails = EMAILS,
-        num_gifts = NUM_GIFTS, 
+        num_gifts = NUM_GIFTS,
         exclude_groups = EXCLUDE_GROUPS,
         send = args.send,
     )
