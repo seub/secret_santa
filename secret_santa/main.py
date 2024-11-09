@@ -123,7 +123,7 @@ class SecretSanta():
         """
         logger.info("Sending emails...")
         for name in self.names:
-            subject = "Père Noël Secret 2023 ! 🎅🤫"
+            subject = "Père Noël Secret 2024 ! 🎅🤫"
             message = self.create_message(name)
             if dry_run:
                 logger.info(f"This is a dry run. Here is the email that would be sent to {name}:\n-----")
@@ -145,15 +145,17 @@ class SecretSanta():
         gifter = name
         giftees = self.secret_lists[gifter]
 
-        res = f"Hohoho! Salut {name} !\n\n"
-        res += "Je suis le bot 🤖 du Père Noël Secret 🎅 en charge des tirages au sort.\n\n"
-        res += "Découvre qui tu vas devoir gâter pour Noël !\n\n"
+        res = f"Hohoho ! Salut {name} !\n\n"
+        res += "Je suis le bot 🤖 du Père Noël, hohoho. Ceci est un message secret ! 🤫\n\n"
+        res += "Voici le résultat du tirage au sort pour toi :\n\n"
 
         for i, giftee in enumerate(giftees):
-            res += f"🎁 Cadeau {i+1} : {giftee}\n"
+            adjective = "(\"gros\") " if i == 0 else  "(\"petit\")"
+            res += f"🎁 Cadeau {i+1} {adjective} : {giftee}\n"
 
-        res += "\n\nJoyeux Noël ! Hohoho! 🎄🎄🎄"
-        res += "\n\nPS: Ne réponds pas à ce message, car Brice ne l'a pas vu !"
+        res += "\n\nJoyeux Noël ! Hohohohoho. 🎄🎄🎄"
+        res += "\nPère Noël Secret 🎅"
+        res += "\n\n\nPS: Ne réponds pas à ce message, car Brice le verrait !"
         return res
 
 
@@ -189,3 +191,4 @@ if __name__ == '__main__':
         exclude_groups = EXCLUDE_GROUPS,
         send = args.send,
     )
+
