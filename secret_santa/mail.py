@@ -2,6 +2,15 @@
 
 """
 This module provides functions to send emails using Gmail.
+
+Example usage:
+```
+export USER_EMAIL="brice.loustau@gmail.com"
+export APP_PASSWORD="your_app_password"
+python3 -m secret_santa.mail
+```
+
+Note: To create an app password: Go to Google Account > Security > 2-Step Verification > App passwords.
 """
 
 
@@ -11,7 +20,7 @@ from functools import cache
 import logging
 import smtplib
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings
 
 
 
@@ -26,8 +35,6 @@ class GmailSettings(BaseSettings):
 
     user_email: str
     app_password: str
-
-    model_config = SettingsConfigDict(env_file='gmail_settings.env', env_file_encoding='utf-8')
 
 
 @cache
